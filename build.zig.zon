@@ -5,9 +5,8 @@
 	.paths = .{""},
 	.dependencies = .{
 		.glfw = .{
-			//.url = "https://github.com/glfw/glfw/archive/refs/tags/3.4.tar.gz",
-			//.hash = "N-V-__8AAL40TADEbrysYHBl-UIZO4KiG4chP8pLDVDINGH4",
-			.path = "../glfw"
+			.path = "../glfw-Mac-x11"
+			//.path = "../glfw_last"
 		},
 		.harfbuzz = .{
 			.url = "https://github.com/harfbuzz/harfbuzz/archive/refs/tags/8.2.2.tar.gz",
