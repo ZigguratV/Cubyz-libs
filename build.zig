@@ -90,7 +90,7 @@ pub fn addVulkanApple(b: *std.Build, step: *std.Build.Step, c_lib: *std.Build.St
 	const headers = b.dependency("Vulkan-Headers", .{});
 	const loader = b.dependency("Vulkan-Loader", .{});
 
-	// NOTE(blackedout): The following build is taken from the Apple paths of the Vulkan loader's CMakeLists.
+	// : The following build is taken from the Apple paths of the Vulkan loader's CMakeLists.
 	// It is not complete as it only supports 64 bit targets, ignores the HAVE_REALPATH check and asm stuff.
 	const loaderSources = [_][]const u8{
 		"allocation.c",
@@ -136,7 +136,7 @@ pub fn addVulkanApple(b: *std.Build, step: *std.Build.Step, c_lib: *std.Build.St
 		.flags = allFlags.items,
 	});
 
-	// NOTE(blackedout): Add the MoltenVK binary and JSON manifest file into the cubyz_deps_* directory
+	// : Add the MoltenVK binary and JSON manifest file into the cubyz_deps_* directory
 	if(target.result.os.tag == .macos) {
 		const moltenVk = b.dependency("MoltenVK-macos", .{});
 		const moltenVkLibPath = moltenVk.path("MoltenVK/dynamic/dylib/macOS/libMoltenVK.dylib");
@@ -164,7 +164,7 @@ pub fn makeVulkanLayers(b: *std.Build, parentStep: *std.Build.Step, name: []cons
 	const validationLayers = b.dependency("Vulkan-ValidationLayers", .{});
 	const utilityLibraries = b.dependency("Vulkan-Utility-Libraries", .{});
 
-	// NOTE(blackedout): How to compile the Vulkan validation layers is taken from the CMakeLists of that project.
+	// : How to compile the Vulkan validation layers is taken from the CMakeLists of that project.
 	// This zig build is very incomplete but somehow still works on macOS
 	const layerSources = [_][]const u8{
 		"error_message/logging.cpp",
@@ -438,7 +438,7 @@ pub fn makeVulkanLayers(b: *std.Build, parentStep: *std.Build.Step, name: []cons
 	const libInstall = b.addInstallArtifact(layerslib, .{.dest_dir = .{.override = .{.custom = b.fmt("lib/{s}", .{name})}}});
 	parentStep.dependOn(&libInstall.step);
 
-	// NOTE(blackedout): Replace the layer name and lib path placeholders in the layer manifest JSON file AFTER it has been installed
+	// : Replace the layer name and lib path placeholders in the layer manifest JSON file AFTER it has been installed
 	const jsonPath = b.fmt("zig-out/lib/{s}/VkLayer_khronos_validation.json", .{name});
 	const replacements: []const ReplacementPair = &.{
 		.{.find = "@JSON_LAYER_NAME@", .replace = "VK_LAYER_KHRONOS_validation"},
@@ -562,7 +562,7 @@ pub inline fn makeCubyzLibs(b: *std.Build, step: *std.Build.Step, name: []const 
 		.optimize = optimize,
 	})});
 
-	// NOTE(blackedout): To cross compile on macOS to macOS, the SDK has to be set correctly
+	// : To cross compile on macOS to macOS, the SDK has to be set correctly
 	if(builtin.os.tag == .macos and target.result.os.tag == .macos) {
 		const sdkPathNewline = b.run(&.{"xcrun", "-sdk", "macosx", "--show-sdk-path"});
 		const sdkPath = sdkPathNewline[0..(sdkPathNewline.len - 1)];
@@ -575,7 +575,7 @@ pub inline fn makeCubyzLibs(b: *std.Build, step: *std.Build.Step, name: []const 
 	c_lib.installHeader(b.path("include/glad/gl.h"), "glad/gl.h");
 	c_lib.installHeader(b.path("include/KHR/khrplatform.h"), "KHR/khrplatform.h");
 
-	// NOTE(blackedout): glad for Vulkan is not needed on macOS since the loader is currently statically linked.
+	// : glad for Vulkan is not needed on macOS since the loader is currently statically linked.
 	// Whether or not glad can be used like Volk to bind the Vulkan functions directly to the driver, I don't know.
 	if(target.result.os.tag != .macos) {
 		c_lib.installHeader(b.path("include/glad/vulkan.h"), "glad/vulkan.h");
@@ -591,7 +591,7 @@ pub inline fn makeCubyzLibs(b: *std.Build, step: *std.Build.Step, name: []const 
 	try addGLFWSources(b, c_lib, target, flags);
 	c_lib.addCSourceFile(.{.file = b.path("lib/gl.c"), .flags = flags});
 
-	// NOTE(blackedout): See the above glad comment
+	// : See the above glad comment
 	if(target.result.os.tag != .macos) {
 		c_lib.addCSourceFile(.{.file = b.path("lib/vulkan.c"), .flags = flags});
 	}
