@@ -480,7 +480,9 @@ pub inline fn addGLFWSources(b: *std.Build, c_lib: *std.Build.Step.Compile, targ
 	const ws: WinSys = switch(os) {
 		.windows => .win32,
 		.linux => .x11,
-		.macos => .cocoa,
+		//EDITED for the sake of using OpenGL 4.6 from mesa
+		//.macos => .cocoa,
+		.macos => .x11,
 		// There are a surprising number of platforms zig supports.
 		// File a bug report if Cubyz doesn't work on yours.
 		else => blk: {
