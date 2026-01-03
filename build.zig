@@ -564,7 +564,7 @@ pub inline fn makeCubyzLibs(b: *std.Build, step: *std.Build.Step, name: []const 
 		.optimize = optimize,
 	})});
 
-	//NOTE(blackedout): To cross compile on macOS to macOS, the SDK has to be set correctly
+	// : To cross compile on macOS to macOS, the SDK has to be set correctly
 	if(builtin.os.tag == .macos and target.result.os.tag == .macos) {
 		const sdkPathNewline = b.run(&.{"xcrun", "-sdk", "macosx", "--show-sdk-path"});
 		const sdkPath = sdkPathNewline[0..(sdkPathNewline.len - 1)];
