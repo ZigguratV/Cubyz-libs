@@ -6,7 +6,8 @@
 	.dependencies = .{
 		.glfw = .{
 			//.path = "glfw-Mac-x11 tag"
-			.path = "https://github.com/archbirdplus/glfw/releases/tag/Mac-x11"
+			.url = "https://github.com/archbirdplus/glfw/archive/refs/tags/Mac-x11.tar.gz",
+			.hash = "N-V-__8AACPPSwDUcRMy-Lmuc0_c39WzJLuyjTNhVHLgtYAz"
 		},
 		.harfbuzz = .{
 			.url = "https://github.com/harfbuzz/harfbuzz/archive/refs/tags/8.2.2.tar.gz",
