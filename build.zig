@@ -24,7 +24,7 @@ fn addPackageCSourceFiles(exe: *std.Build.Step.Compile, dep: *std.Build.Dependen
 fn patchFile(b: *std.Build, tool: *std.Build.Step.Compile, replacements: []const ReplacementPair, filePath: []const u8, dependency: *std.Build.Step) *std.Build.Step {
 	var step = dependency;
 
-	for(replacements) |pair| {
+	for (replacements) |pair| {
 		const cmd = b.addRunArtifact(tool);
 		cmd.addArgs(&.{pair.find, pair.replace});
 		cmd.addFileArg(b.path(filePath));
@@ -84,6 +84,118 @@ const freetypeSources = [_][]const u8{
 	"src/winfonts/winfnt.c",
 };
 
+const tfPsaCryptoCoreSources: []const []const u8 = &.{
+	"psa_crypto.c",
+	"psa_crypto_client.c",
+	"psa_crypto_slot_management.c",
+	"psa_crypto_storage.c",
+	"psa_its_file.c",
+	"tf_psa_crypto_config.c",
+	"tf_psa_crypto_version.c",
+};
+
+const tfPsaCryptoDriverSources: []const []const u8 = &.{
+	"aes.c",
+	"aesce.c",
+	"aesni.c",
+	"aria.c",
+	"asn1parse.c",
+	"asn1write.c",
+	"base64.c",
+	"bignum.c",
+	"bignum_core.c",
+	"bignum_mod.c",
+	"bignum_mod_raw.c",
+	"block_cipher.c",
+	"camellia.c",
+	"ccm.c",
+	"chacha20.c",
+	"chachapoly.c",
+	"cipher.c",
+	"cipher_wrap.c",
+	"cmac.c",
+	"constant_time.c",
+	"ctr_drbg.c",
+	"ecdh.c",
+	"ecdsa.c",
+	"ecjpake.c",
+	"ecp.c",
+	"ecp_curves.c",
+	"ecp_curves_new.c",
+	"entropy.c",
+	"entropy_poll.c",
+	"gcm.c",
+	"hmac_drbg.c",
+	"lmots.c",
+	"lms.c",
+	"md.c",
+	"md5.c",
+	"memory_buffer_alloc.c",
+	"nist_kw.c",
+	"oid.c",
+	"pem.c",
+	"pk.c",
+	"pk_ecc.c",
+	"pk_rsa.c",
+	"pk_wrap.c",
+	"pkcs5.c",
+	"pkparse.c",
+	"pkwrite.c",
+	"platform.c",
+	"platform_util.c",
+	"poly1305.c",
+	"psa_crypto_aead.c",
+	"psa_crypto_cipher.c",
+	"psa_crypto_ecp.c",
+	"psa_crypto_ffdh.c",
+	"psa_crypto_hash.c",
+	"psa_crypto_mac.c",
+	"psa_crypto_pake.c",
+	"psa_crypto_rsa.c",
+	"psa_util.c",
+	"ripemd160.c",
+	"rsa.c",
+	"rsa_alt_helpers.c",
+	"sha1.c",
+	"sha256.c",
+	"sha3.c",
+	"sha512.c",
+	"threading.c",
+};
+
+const mbedTlsSources: []const []const u8 = &.{
+	"mbedtls_config.c",
+	"pkcs7.c",
+	"x509.c",
+	"x509_create.c",
+	"x509_crl.c",
+	"x509_crt.c",
+	"x509_csr.c",
+	"x509_oid.c",
+	"x509write.c",
+	"x509write_crt.c",
+	"x509write_csr.c",
+	"debug.c",
+	"mps_reader.c",
+	"mps_trace.c",
+	"net_sockets.c",
+	"ssl_cache.c",
+	"ssl_ciphersuites.c",
+	"ssl_client.c",
+	"ssl_cookie.c",
+	"ssl_msg.c",
+	"ssl_ticket.c",
+	"ssl_tls.c",
+	"ssl_tls12_client.c",
+	"ssl_tls12_server.c",
+	"ssl_tls13_keys.c",
+	"ssl_tls13_server.c",
+	"ssl_tls13_client.c",
+	"ssl_tls13_generic.c",
+	"timing.c",
+	"version.c",
+};
+
 pub fn addVulkanApple(b: *std.Build, step: *std.Build.Step, c_lib: *std.Build.Step.Compile, name: []const u8, target: std.Build.ResolvedTarget, flags: []const []const u8, replace_tool: *std.Build.Step.Compile) !void {
 	std.debug.assert(target.result.os.tag.isDarwin());
 
@@ -111,9 +223,9 @@ pub fn addVulkanApple(b: *std.Build, step: *std.Build.Step, c_lib: *std.Build.St
 
 	var allFlags: std.ArrayList([]const u8) = .{};
 	try allFlags.appendSlice(b.allocator, flags);
-	if(target.result.os.tag == .ios) {
+	if (target.result.os.tag == .ios) {
 		try allFlags.append(b.allocator, "-DVK_USE_PLATFORM_IOS_MVK");
-	} else if(target.result.os.tag == .macos) {
+	} else if (target.result.os.tag == .macos) {
 		try allFlags.append(b.allocator, "-DVK_USE_PLATFORM_MACOS_MVK");
 	}
 	try allFlags.appendSlice(b.allocator, &[_][]const u8{
@@ -136,8 +248,8 @@ pub fn addVulkanApple(b: *std.Build, step: *std.Build.Step, c_lib: *std.Build.St
 		.flags = allFlags.items,
 	});
 
-	//NOTE(blackedout): Add the MoltenVK binary and JSON manifest file into the cubyz_deps_* directory
-	if(target.result.os.tag == .macos) {
+	// NOTE(blackedout): Add the MoltenVK binary and JSON manifest file into the cubyz_deps_* directory
+	if (target.result.os.tag == .macos) {
 		const moltenVk = b.dependency("MoltenVK-macos", .{});
 		const moltenVkLibPath = moltenVk.path("MoltenVK/dynamic/dylib/macOS/libMoltenVK.dylib");
 		const moltenVkJsonPath = moltenVk.path("MoltenVK/dynamic/dylib/macOS/MoltenVK_icd.json");
@@ -386,7 +498,7 @@ pub fn makeVulkanLayers(b: *std.Build, parentStep: *std.Build.Step, name: []cons
 
 	var allFlags: std.ArrayList([]const u8) = .{};
 	try allFlags.appendSlice(b.allocator, flags);
-	switch(target.result.os.tag) {
+	switch (target.result.os.tag) {
 		.windows => {
 			try allFlags.append(b.allocator, "-DVK_USE_PLATFORM_WIN32_KHR");
 		},
@@ -457,7 +569,7 @@ pub fn addFreetypeAndHarfbuzz(b: *std.Build, c_lib: *std.Build.Step.Compile, tar
 	c_lib.addIncludePath(freetype.path("include"));
 	c_lib.installHeadersDirectory(freetype.path("include"), "", .{});
 	addPackageCSourceFiles(c_lib, freetype, &freetypeSources, flags);
-	if(target.result.os.tag == .macos) c_lib.addCSourceFile(.{
+	if (target.result.os.tag == .macos) c_lib.addCSourceFile(.{
 		.file = freetype.path("src/base/ftmac.c"),
 		.flags = &.{},
 	});
@@ -474,10 +586,10 @@ pub inline fn addGLFWSources(b: *std.Build, c_lib: *std.Build.Step.Compile, targ
 	const root = glfw.path("src");
 	const os = target.result.os.tag;
 
-	const WinSys = enum {win32, x11, cocoa};
+	const WinSys = enum { win32, x11, cocoa };
 
 	// TODO: Wayland
-	const ws: WinSys = switch(os) {
+	const ws: WinSys = switch (os) {
 		.windows => .win32,
 		.linux => .x11,
 		//EDITED for the sake of using OpenGL 4.6 from mesa
@@ -490,7 +602,7 @@ pub inline fn addGLFWSources(b: *std.Build, c_lib: *std.Build.Step.Compile, targ
 			break :blk .x11;
 		},
 	};
-	const wsFlag = switch(ws) {
+	const wsFlag = switch (ws) {
 		.win32 => "-D_GLFW_WIN32",
 		.x11 => "-D_GLFW_X11",
 		.cocoa => "-D_GLFW_COCOA",
@@ -498,7 +610,7 @@ pub inline fn addGLFWSources(b: *std.Build, c_lib: *std.Build.Step.Compile, targ
 	var allFlags = try std.ArrayList([]const u8).initCapacity(b.allocator, 0);
 	try allFlags.appendSlice(b.allocator, flags);
 	try allFlags.append(b.allocator, wsFlag);
-	if(os == .linux) {
+	if (os == .linux) {
 		try allFlags.append(b.allocator, "-D_GNU_SOURCE");
 	}
 
@@ -506,20 +618,20 @@ pub inline fn addGLFWSources(b: *std.Build, c_lib: *std.Build.Step.Compile, targ
 	c_lib.installHeader(glfw.path("include/GLFW/glfw3.h"), "GLFW/glfw3.h");
 	const fileses: [3][]const []const u8 = .{
 		&.{"context.c", "init.c", "input.c", "monitor.c", "platform.c", "vulkan.c", "window.c", "egl_context.c", "osmesa_context.c", "null_init.c", "null_monitor.c", "null_window.c", "null_joystick.c"},
-		switch(os) {
+		switch (os) {
 			.windows => &.{"win32_module.c", "win32_time.c", "win32_thread.c"},
 			.linux => &.{"posix_module.c", "posix_time.c", "posix_thread.c", "linux_joystick.c"},
 			.macos => &.{"cocoa_time.c", "posix_module.c", "posix_thread.c"},
 			else => &.{"posix_module.c", "posix_time.c", "posix_thread.c", "linux_joystick.c"},
 		},
-		switch(ws) {
+		switch (ws) {
 			.win32 => &.{"win32_init.c", "win32_joystick.c", "win32_monitor.c", "win32_window.c", "wgl_context.c"},
 			.x11 => &.{"x11_init.c", "x11_monitor.c", "x11_window.c", "xkb_unicode.c", "glx_context.c", "posix_poll.c"},
 			.cocoa => &.{"cocoa_init.m", "cocoa_joystick.m", "cocoa_monitor.m", "cocoa_window.m", "nsgl_context.m"},
 		},
 	};
 
-	for(fileses) |files| {
+	for (fileses) |files| {
 		c_lib.addCSourceFiles(.{
 			.root = root,
 			.files = files,
@@ -547,6 +659,45 @@ pub fn addMiniaudioAndStbVorbis(b: *std.Build, c_lib: *std.Build.Step.Compile, f
 	c_lib.addCSourceFile(.{.file = b.path("lib/miniaudio_stbvorbis.c"), .flags = flags});
 }
 
+pub fn addMbedTls(b: *std.Build, c_lib: *std.Build.Step.Compile, flags: []const []const u8) void {
+	const mbedtls = b.dependency("mbedtls", .{});
+	const tfPsaCrypto = b.dependency("tf_psa_crypto", .{});
+	c_lib.addCSourceFiles(.{
+		.root = mbedtls.path("library"),
+		.files = mbedTlsSources,
+		.flags = flags,
+	});
+	c_lib.addCSourceFiles(.{
+		.root = tfPsaCrypto.path("core"),
+		.files = tfPsaCryptoCoreSources,
+		.flags = flags,
+	});
+	c_lib.addCSourceFiles(.{
+		.root = tfPsaCrypto.path("drivers/builtin/src"),
+		.files = tfPsaCryptoDriverSources,
+		.flags = flags,
+	});
+	c_lib.addCSourceFile(.{
+		.file = b.path("lib/tf_psa_crypto/psa_crypto_driver_wrappers_no_static.c"), // Generated file
+		.flags = flags,
+	});
+	c_lib.addCSourceFiles(.{
+		.root = b.path("lib/mbedtls"),
+		.files = &.{"error.c", "ssl_debug_helpers_generated.c", "version_features.c"}, // Generated files
+		.flags = flags,
+	});
+	c_lib.addIncludePath(b.path("lib/tf_psa_crypto")); // Contains generated files
+	c_lib.addIncludePath(b.path("lib/mbedtls")); // Contains generated files
+	c_lib.addIncludePath(tfPsaCrypto.path("core"));
+	c_lib.addIncludePath(tfPsaCrypto.path("drivers/builtin/src"));
+	c_lib.addIncludePath(tfPsaCrypto.path("include"));
+	c_lib.addIncludePath(tfPsaCrypto.path("drivers/builtin/include"));
+	c_lib.addIncludePath(mbedtls.path("include"));
+	c_lib.installHeadersDirectory(mbedtls.path("include"), "", .{});
+	c_lib.installHeadersDirectory(tfPsaCrypto.path("include"), "", .{});
+	c_lib.installHeadersDirectory(tfPsaCrypto.path("drivers/builtin/include"), "", .{});
+}
+
 pub inline fn addHeaderOnlyLibs(b: *std.Build, c_lib: *std.Build.Step.Compile, flags: []const []const u8) void {
 	const cgltf = b.dependency("cgltf", .{});
 
@@ -564,8 +715,9 @@ pub inline fn makeCubyzLibs(b: *std.Build, step: *std.Build.Step, name: []const 
 		.optimize = optimize,
 	})});
 
-	// : To cross compile on macOS to macOS, the SDK has to be set correctly
-	if(builtin.os.tag == .macos and target.result.os.tag == .macos) {
+	/// NOTE(blackedout): 
+	/// To cross compile on macOS to macOS, the SDK has to be set correctly
+	if (builtin.os.tag == .macos and target.result.os.tag == .macos) {
 		const sdkPathNewline = b.run(&.{"xcrun", "-sdk", "macosx", "--show-sdk-path"});
 		const sdkPath = sdkPathNewline[0..(sdkPathNewline.len - 1)];
 		c_lib.root_module.addSystemFrameworkPath(.{.cwd_relative = b.fmt("{s}/System/Library/Frameworks", .{sdkPath})});
@@ -579,7 +731,7 @@ pub inline fn makeCubyzLibs(b: *std.Build, step: *std.Build.Step, name: []const 
 
 	//NOTE(blackedout): glad for Vulkan is not needed on macOS since the loader is currently statically linked.
 	// Whether or not glad can be used like Volk to bind the Vulkan functions directly to the driver, I don't know.
-	if(target.result.os.tag != .macos) {
+	if (target.result.os.tag != .macos) {
 		c_lib.installHeader(b.path("include/glad/vulkan.h"), "glad/vulkan.h");
 		c_lib.installHeader(b.path("include/vk_platform.h"), "vk_platform.h");
 	}
@@ -587,14 +739,15 @@ pub inline fn makeCubyzLibs(b: *std.Build, step: *std.Build.Step, name: []const 
 	addHeaderOnlyLibs(b, c_lib, flags);
 	addFreetypeAndHarfbuzz(b, c_lib, target, flags);
 	addMiniaudioAndStbVorbis(b, c_lib, flags, replace_tool);
-	if(target.result.os.tag == .macos) {
+	if (target.result.os.tag == .macos) {
 		try addVulkanApple(b, step, c_lib, name, target, flags, replace_tool);
 	}
 	try addGLFWSources(b, c_lib, target, flags);
+	addMbedTls(b, c_lib, flags);
 	c_lib.addCSourceFile(.{.file = b.path("lib/gl.c"), .flags = flags});
 
-	//NOTE(blackedout): See the above glad comment
-	if(target.result.os.tag != .macos) {
+	// NOTE(blackedout): See the above glad comment
+	if (target.result.os.tag != .macos) {
 		c_lib.addCSourceFile(.{.file = b.path("lib/vulkan.c"), .flags = flags});
 	}
 
@@ -662,7 +815,7 @@ pub fn build(b: *std.Build) !void {
 		}),
 	});
 
-	for(targets) |target| {
+	for (targets) |target| {
 		const t = b.resolveTargetQuery(target);
 		const name = t.result.linuxTriple(b.allocator) catch unreachable;
 		const subStep = b.step(name, b.fmt("Build only {s}", .{name}));
@@ -672,7 +825,7 @@ pub fn build(b: *std.Build) !void {
 
 		subStep.dependOn(&install.step);
 
-		if(t.result.os.tag == .macos) {
+		if (t.result.os.tag == .macos) {
 			try makeVulkanLayers(b, subStep, deps, t, .ReleaseSmall, c_flags, replace_tool);
 		}
 
@@ -687,7 +840,7 @@ pub fn build(b: *std.Build) !void {
 
 		nativeStep.dependOn(&install.step);
 
-		if(preferredTarget.result.os.tag == .macos) {
+		if (preferredTarget.result.os.tag == .macos) {
 			try makeVulkanLayers(b, nativeStep, deps, preferredTarget, preferredOptimize, c_flags, replace_tool);
 		}
 	}
